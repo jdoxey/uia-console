@@ -1,0 +1,88 @@
+<!doctype html>
+<!--
+  TODO:
+    * Recents
+    * Links to help (context sensitive?)
+ -->
+<html>
+  <head>
+    <title>UIAutomation Console</title>
+    <style type="text/css">
+      body {
+        font-family: Helvetica;
+      }
+      textarea {
+        width: 99%;
+        height: 200px;
+        padding: 4px;
+        border-radius: 5px;
+        background-color: Black;
+        font-family: monaco;
+        color: LightGrey;
+        font-size: 12px;
+      }
+      #cheat-sheet {
+        margin-top: 15px;
+        border: solid 1px DimGrey;
+        border-radius: 5px;
+        color: DimGray;
+      }
+      #cheat-sheet h3 {
+        margin: 0px;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        padding: 5px 10px;
+        background: -moz-linear-gradient(top,  rgba(206,220,231,1) 0%, rgba(89,106,114,1) 100%); /* FF3.6+ */
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(206,220,231,1)), color-stop(100%,rgba(89,106,114,1))); /* Chrome,Safari4+ */
+        background: -webkit-linear-gradient(top,  rgba(206,220,231,1) 0%,rgba(89,106,114,1) 100%); /* Chrome10+,Safari5.1+ */
+        font-size: large;
+        color: White;
+        text-shadow: 0px -1px Black;
+      }
+      #cheat-sheet-content {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+      dd {
+        font-family: monaco;
+        font-size: 12px;
+      }
+    </style>
+    <script>
+      function runClicked() {
+        var ajax = new XMLHttpRequest();
+        ajax.open("POST", "submit-command", true);
+        ajax.send(document.getElementById('textarea').value);
+      }
+      function continueClicked() {
+        var ajax = new XMLHttpRequest();
+        ajax.open("POST", "submit-command", true);
+        ajax.send("continue");
+      }
+    </script>
+  </head>
+  <body>
+    <textarea id="textarea"></textarea>
+    <div>
+      <button onclick="runClicked();">Execute</button>
+      <button onclick="continueClicked();">Continue</button>
+    </div>
+    <div id="cheat-sheet">
+      <h3>Cheat Sheet</h3>
+      <div id="cheat-sheet-content">
+        <dl>
+          <dt>Log main window</dt>
+          <dd>UIATarget.localTarget().frontMostApp().mainWindow().logElementTree();</dd>
+        </dl>
+        <dl>
+          <dt>Go to tab</dt>
+          <dd>UIATarget.localTarget().frontMostApp().mainWindow().tabBar().buttons()["Home"].tap();</dd>
+        </dl>
+        <dl>
+          <dt>Take screenshot</dt>
+          <dd>UIATarget.localTarget().captureScreenWithName("UIAConsole_screenshot");</dd>
+        </dl>
+      </div>
+    </div>
+  </body>
+</html>
