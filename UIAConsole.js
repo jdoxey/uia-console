@@ -22,6 +22,23 @@ var UIAConsole = {
       }
       UIATarget.localTarget().delay(1);
     }
+  },
+
+  startServer: function () {
+    UIALogger.logMessage("[UIAConsole] Starting server");
+    var envCommand = UIATarget.localTarget().host().performTaskWithPathArgumentsTimeout("/usr/bin/env", [], 10);
+    var pwd = envCommand.stdout.match(/^PWD=(.*)$/m)[1];
+    var findCommand = UIATarget.localTarget().host().performTaskWithPathArgumentsTimeout("/usr/bin/find", [ pwd, "-name", "start_server.rb" ], 10);
+    var serverScript = findCommand.stdout;
+    UIATarget.localTarget().host().performTaskWithPathArgumentsTimeout("/bin/launchctl",
+        [ 'submit', '-l', 'uiaconsole-server', '-o', '/tmp/uiaconsole-server.out', '-e', '/tmp/uiaconsole-server.err', '--', 'bash', '-c', serverScript ], 30);
+  },
+
+  stopServer: function () {
+      UIATarget.localTarget().host().performTaskWithPathArgumentsTimeout("/bin/launchctl", [ 'remove', 'uiaconsole-server' ], 30);
   }
 
 };
+
+// Start server
+UIAConsole.startServer();
