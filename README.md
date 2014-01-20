@@ -13,3 +13,8 @@ Quickstart
 5. Run your script from Instruments (`command-i`) and wait for the browser to pop up.
 6. Submit script you'd normally see in a UIAutomation script (check for output in the Instruments console)
 7. Hit "Continue" to run the rest of your script
+
+Problems?
+--------
+Check the logs at /tmp/uiaconsole-server.out and /tmp/uiaconsole-server.err
+
