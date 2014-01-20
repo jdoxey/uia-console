@@ -16,5 +16,5 @@ Quickstart
 
 Problems?
 --------
-Check the logs at /tmp/uiaconsole-server.out and /tmp/uiaconsole-server.err
+Check the logs at `/tmp/uiaconsole-server.out` and `/tmp/uiaconsole-server.err`
 
