@@ -1,44 +1,31 @@
 var UIAConsole = {
-
-  breakpoint: function () {
-    UIALogger.logMessage("[UIAConsole] Hit breakpoint, opening browser...");
-    UIATarget.localTarget().host().performTaskWithPathArgumentsTimeout('/bin/sh',
-        [ '-c', 'open http://localhost:4567/console.html &' ], 1);
-    while (true) {
-      var result = UIATarget.localTarget().host().performTaskWithPathArgumentsTimeout('/usr/bin/env',
-          [ 'curl', 'http://localhost:4567/next-command' ], 5);
-      if (result.stdout == "continue") {
+    breakpoint: function () {
+        UIALogger.logMessage("[UIAConsole] Hit breakpoint, opening browser...");
+        this._openBrowser();
+        for (var command = this._readCommand(); command != "continue"; command = this._readCommand()) {
+            if (command !== null) {
+                eval(command);
+            }
+        }
         UIALogger.logMessage("[UIAConsole] ...continuing execution");
-        break;
-      }
-      if (result.stdout != "") {
-        UIALogger.logMessage("[UIAConsole] Running: " + result.stdout);
-        try {
-          eval(result.stdout);
+    },
+    _openBrowser: function () {
+        var envCommand = UIATarget.localTarget().host().performTaskWithPathArgumentsTimeout("/usr/bin/env", [], 10);
+        var pwd = envCommand.stdout.match(/^PWD=(.*)$/m)[1];
+        var findCommand = UIATarget.localTarget().host().performTaskWithPathArgumentsTimeout("/usr/bin/find", [ pwd, "-name", "uia-console.html" ], 10);
+        UIATarget.localTarget().host().performTaskWithPathArgumentsTimeout('/bin/sh', [ '-c', "open file://" + findCommand.stdout + " &" ], 10);
+    },
+    _readCommand: function () {
+        var okResponse = '"HTTP/1.1 200 OK\\nContent-Length: 2\\nConnection: close\\n\\nOK"';
+        var ncShellCommand = this._shellCommand('echo ' + okResponse + ' | nc -l 4567', 10);
+        if (ncShellCommand.stdout === "") {
+            return null;
         }
-        catch (e) {
-          UIALogger.logMessage("[UIAConsole] " + e);
-        }
-      }
-      UIATarget.localTarget().delay(1);
+        var command = ncShellCommand.stdout.match(/\r\n\r\n([^$]*)$/m)[1];
+        return command;
+    },
+    _shellCommand: function (command, timeout) {
+        return UIATarget.localTarget().host().performTaskWithPathArgumentsTimeout('/bin/sh', [ '-c', command ], timeout);
     }
-  },
-
-  startServer: function () {
-    UIALogger.logMessage("[UIAConsole] Starting server");
-    var envCommand = UIATarget.localTarget().host().performTaskWithPathArgumentsTimeout("/usr/bin/env", [], 10);
-    var pwd = envCommand.stdout.match(/^PWD=(.*)$/m)[1];
-    var findCommand = UIATarget.localTarget().host().performTaskWithPathArgumentsTimeout("/usr/bin/find", [ pwd, "-name", "start_server.rb" ], 10);
-    var serverScript = findCommand.stdout;
-    UIATarget.localTarget().host().performTaskWithPathArgumentsTimeout("/bin/launchctl",
-        [ 'submit', '-l', 'uiaconsole-server', '-o', '/tmp/uiaconsole-server.out', '-e', '/tmp/uiaconsole-server.err', '--', 'bash', '-c', serverScript ], 30);
-  },
-
-  stopServer: function () {
-      UIATarget.localTarget().host().performTaskWithPathArgumentsTimeout("/bin/launchctl", [ 'remove', 'uiaconsole-server' ], 30);
-  }
-
 };
 
-// Start server
-UIAConsole.startServer();

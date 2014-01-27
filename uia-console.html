@@ -51,12 +51,12 @@
     <script>
       function runClicked() {
         var ajax = new XMLHttpRequest();
-        ajax.open("POST", "submit-command", true);
+        ajax.open("POST", "http://localhost:4567/submit-command", true);
         ajax.send(document.getElementById('textarea').value);
       }
       function continueClicked() {
         var ajax = new XMLHttpRequest();
-        ajax.open("POST", "submit-command", true);
+        ajax.open("POST", "http://localhost:4567/submit-command", true);
         ajax.send("continue");
       }
     </script>
@@ -73,6 +73,10 @@
         <dl>
           <dt>Log main window</dt>
           <dd>UIATarget.localTarget().frontMostApp().mainWindow().logElementTree();</dd>
+        </dl>
+        <dl>
+          <dt>Log output</dt>
+          <dd>UIALogger.logDebug("Hello");</dd>
         </dl>
         <dl>
           <dt>Go to tab</dt>
